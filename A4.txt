@@ -1,0 +1,78 @@
+nano ques4.cpp
+g++ ques4.cpp -o ques4 -lssl -lcrypto
+./ques4
+
+Ques4: Create a simple blockchain using Proof of Work(PoW)
+Code:
+#include <iostream>
+#include <vector>
+#include <sstream>
+#include <iomanip>
+#include <openssl/sha.h>
+using namespace std;
+
+string sha256(const string &input) {
+	unsigned char hash[SHA256_DIGEST_LENGTH];
+	SHA256((unsigned char*)input.c_str(), input.size(), hash);
+	stringstream ss;
+	for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+    	ss << hex << setw(2) << setfill('0') << (int)hash[i];
+	}
+	return ss.str();
+}
+class Block {
+public:
+	int index;
+	string data;
+	string previousHash;
+	string hash;
+	int nonce;
+ 
+	Block(int idx, string d, string prevHash) {
+    	index = idx;
+    	data = d;
+    	previousHash = prevHash;
+    	nonce = 0;
+    	hash = calculateHash();
+	}
+ 
+	string calculateHash() {
+    	string input = to_string(index) + data + previousHash + to_string(nonce);
+    	return sha256(input);
+	}
+ 
+	void mineBlock() {
+    	while (hash.substr(0, 2) != "00") {
+        	nonce++;
+        	hash = calculateHash();
+    	}
+	}
+};
+ 
+int main() {
+	vector<Block> blockchain;
+ 
+	// Genesis Block
+	Block genesis(0, "A -> B", "0");
+	genesis.mineBlock();
+	blockchain.push_back(genesis);
+ 
+	// Block 1
+	Block b1(1, "B -> C", blockchain.back().hash);
+	b1.mineBlock();
+	blockchain.push_back(b1);
+ 
+	// Block 2
+	Block b2(2, "C -> D", blockchain.back().hash);
+	b2.mineBlock();
+	blockchain.push_back(b2);
+	for (auto &block : blockchain) {
+    	cout << "--------------------------\n";
+    	cout << "Index: " << block.index << endl;
+    	cout << "Data: " << block.data << endl;
+    	cout << "Hash: " << block.hash << endl;
+    	cout << "Previous Hash: " << block.previousHash << endl;
+    	cout << "Nonce: " << block.nonce << endl;
+	}
+	return 0;
+}
