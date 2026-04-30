@@ -1,0 +1,75 @@
+Oues3: Implement RSA cryptographic algorithm
+
+OUPTUT: 
+nano ques3.cpp
+g++ ques3.cpp -o ques3
+./ques3
+
+Code:
+#include <iostream>
+using namespace std;
+
+// Function for modular exponentiation
+long long modPow(long long base, long long exp, long long mod)
+{
+    long long result = 1;
+
+    while (exp > 0)
+    {
+        result = (result * base) % mod;
+        exp--;
+    }
+    return result;
+}
+
+int main()
+{
+    int p, q, e, M;
+
+    cout << "Enter value of p: ";
+    cin >> p;
+
+    cout << "Enter value of q: ";
+    cin >> q;
+
+    cout << "Enter value of e: ";
+    cin >> e;
+
+    cout << "Enter message M: ";
+    cin >> M;
+
+    // Step 1: Calculate n and phi(n)
+    int n = p * q;
+    int phi = (p - 1) * (q - 1);
+
+    // Step 2: Find private key d
+    int d = 1;
+    while ((d * e) % phi != 1)
+    {
+        d++;
+    }
+    // Step 3: Encrypt
+    long long C = modPow(M, e, n);
+
+    // Step 4: Decrypt
+    long long decrypted = modPow(C, d, n);
+
+    cout << "\nRSA Encryption and Decryption";
+    cout << "\n-----------------------------";
+    cout << "\np = " << p << ", q = " << q;
+    cout << "\nn = " << n;
+    cout << "\nphi(n) = " << phi;
+    cout << "\nPublic Key (e, n) = (" << e << ", " << n << ")";
+    cout << "\nPrivate Key (d, n) = (" << d << ", " << n << ")";
+
+    cout << "\n\nOriginal Message = " << M;
+    cout << "\nEncrypted Ciphertext = " << C;
+    cout << "\nDecrypted Message = " << decrypted;
+
+    if (decrypted == M)
+        cout << "\n\nVerification Successful: Original message recovered.";
+    else
+        cout << "\n\nVerification Failed.";
+
+    return 0;
+}
