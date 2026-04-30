@@ -1,0 +1,74 @@
+Ques7: Create a blockchain having 5 nodes and print the hash values of each block.
+Code:
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
+#include <openssl/sha.h>
+
+using namespace std;
+
+// SHA256 Hash Function
+string sha256(string input) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+
+    SHA256((unsigned char*)input.c_str(), input.size(), hash);
+
+    stringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        ss << hex << setw(2) << setfill('0') << (int)hash[i];
+    }
+
+    return ss.str();
+}
+
+// Block Class
+class Block {
+public:
+    int index;
+    string data;
+    string previousHash;
+    string hash;
+    long timestamp;
+
+    Block(int i, string d, string prevHash) {
+        index = i;
+        data = d;
+        previousHash = prevHash;
+        timestamp = time(0);
+        hash = calculateHash();
+    }
+
+    string calculateHash() {
+        return sha256(to_string(index) + data + previousHash + to_string(timestamp));
+    }
+};
+
+int main() {
+    vector<Block> chain;
+
+    // Genesis Block
+    chain.push_back(Block(0, "Genesis Block", "0"));
+
+    // Create 5 Blocks
+    for (int i = 1; i <= 5; i++) {
+        string data;
+        cout << "Enter data for Block " << i << ": ";
+        getline(cin, data);
+
+        chain.push_back(Block(i, data, chain.back().hash));
+    }
+
+    cout << "\n===== Blockchain with 5 Nodes =====\n";
+
+    for (auto &block : chain) {
+        cout << "\nBlock " << block.index << endl;
+        cout << "Data          : " << block.data << endl;
+        cout << "Previous Hash : " << block.previousHash << endl;
+        cout << "Current Hash  : " << block.hash << endl;
+        cout << "----------------------------------" << endl;
+    }
+
+    return 0;
+}
