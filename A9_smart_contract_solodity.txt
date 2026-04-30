@@ -1,6 +1,5 @@
 Ques9: Implement a smart contract using solidity programming language
 
-
 Code: 
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
@@ -18,3 +17,43 @@ contract SimpleContract {
     }
 }
 
+Q2. Create a contract to store student name and age. (Use: - string and uint )
+Code:
+pragma solidity ^0.8.0;
+contract StudentDetails {
+    string public studentName;
+    uint public age;
+    function setStudent(string memory _name, uint _age) public {
+        studentName = _name;
+        age = _age;
+    }
+    function getStudent() public view returns(string memory, uint) {
+        return (studentName, age);
+    }
+}
+
+
+Q3. Write a contract to transfer funds between users.   
+Code:
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract FundTransfer {
+
+    // Deposit ETH into contract
+    function deposit() public payable {}
+
+    // Check contract balance
+    function getBalance() public view returns (uint) {
+        return address(this).balance;
+    }
+
+    // Transfer ETH to another address
+    function transfer(address payable _to, uint _amount) public {
+        require(address(this).balance >= _amount, "Insufficient balance");
+
+        (bool success, ) = _to.call{value: _amount}("");
+        require(success, "Transfer failed");
+    }
+}
