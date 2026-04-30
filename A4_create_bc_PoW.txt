@@ -1,8 +1,9 @@
+Ques4: Create a simple blockchain using Proof of Work(PoW)
+
 nano ques4.cpp
 g++ ques4.cpp -o ques4 -lssl -lcrypto
 ./ques4
 
-Ques4: Create a simple blockchain using Proof of Work(PoW)
 Code:
 #include <iostream>
 #include <vector>
