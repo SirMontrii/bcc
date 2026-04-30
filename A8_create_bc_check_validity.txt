@@ -1,0 +1,116 @@
+Ques8: Create a blockchain having 5 nodes and check its validity.
+Code:
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <sstream>
+#include <openssl/sha.h>
+#include <iomanip>
+using namespace std;
+
+// Function to generate SHA256 hash
+string sha256(string input) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256((unsigned char*)input.c_str(), input.size(), hash);
+
+    stringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        ss << hex << setw(2) << setfill('0') << (int)hash[i];
+    }
+    return ss.str();
+}
+
+// Block class
+class Block {
+public:
+    int index;
+    string data;
+    string previousHash;
+    string hash;
+    long timestamp;
+
+    Block(int idx, string d, string prevHash) {
+        index = idx;
+        data = d;
+        previousHash = prevHash;
+        timestamp = time(0);
+        hash = calculateHash();
+    }
+
+    string calculateHash() {
+        string input = to_string(index) + data + previousHash + to_string(timestamp);
+        return sha256(input);
+    }
+};
+
+// Blockchain class
+class Blockchain {
+public:
+    vector<Block> chain;
+
+    Blockchain() {
+        chain.push_back(createGenesisBlock());
+    }
+
+    Block createGenesisBlock() {
+        return Block(0, "Genesis Block", "0");
+    }
+
+    Block getLatestBlock() {
+        return chain.back();
+    }
+
+    void addBlock(string data) {
+        Block newBlock(chain.size(), data, getLatestBlock().hash);
+        chain.push_back(newBlock);
+    }
+
+    void printChain() {
+        for (auto &block : chain) {
+            cout << "\nBlock " << block.index << endl;
+            cout << "Data          : " << block.data << endl;
+            cout << "Previous Hash : " << block.previousHash << endl;
+            cout << "Hash          : " << block.hash << endl;
+            cout << "-----------------------------------" << endl;
+        }
+    }
+
+    bool isChainValid() {
+        for (int i = 1; i < chain.size(); i++) {
+            Block current = chain[i];
+            Block previous = chain[i - 1];
+
+            if (current.hash != current.calculateHash())
+                return false;
+
+            if (current.previousHash != previous.hash)
+                return false;
+        }
+        return true;
+    }
+};
+
+int main() {
+    Blockchain myChain;
+    int n;
+
+    cout << "Enter total number of blocks (excluding Genesis Block): ";
+    cin >> n;
+    cin.ignore();
+
+    // User input for blocks
+    for (int i = 1; i <= n; i++) {
+        string data;
+        cout << "Enter data for Block " << i << ": ";
+        getline(cin, data);
+        myChain.addBlock(data);
+    }
+
+    cout << "\n===== Original Blockchain =====\n";
+    myChain.printChain();
+
+    cout << "\nBlockchain Validity: ";
+    cout << (myChain.isChainValid() ? "Valid" : "Invalid") << endl;
+
+    return 0;
+}
