@@ -1,0 +1,97 @@
+Ques6: Create a blockchain containing block hash, transaction history, time of creation
+Code: 
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
+#include <openssl/sha.h>
+using namespace std;
+
+string sha256(string input) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+
+    SHA256((unsigned char*)input.c_str(), input.length(), hash);
+
+    stringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        ss << hex << setw(2) << setfill('0') << (int)hash[i];
+    }
+    return ss.str();
+}
+// Block Class
+class Block {
+public:
+    int index;
+    string transaction;
+    string previousHash;
+    string hash;
+    string timestamp;
+
+    Block(int idx, string tx, string prevHash) {
+        index = idx;
+        transaction = tx;
+        previousHash = prevHash;
+
+        time_t now = time(0);
+        timestamp = ctime(&now);
+
+        hash = calculateHash();
+    }
+
+    string calculateHash() {
+        string data = to_string(index) + transaction + previousHash + timestamp;
+        return sha256(data);
+    }
+
+    void displayBlock() {
+        cout << "\nBlock #" << index << endl;
+        cout << "Transaction History: " << transaction << endl;
+        cout << "Time of Creation: " << timestamp;
+        cout << "Previous Hash: " << previousHash << endl;
+        cout << "Current Hash: " << hash << endl;
+    }
+};
+// Blockchain Class
+class Blockchain {
+public:
+    vector<Block> chain;
+
+    Blockchain() {
+        chain.push_back(Block(0, "Genesis Block", "0"));
+    }
+
+    void addBlock(string transaction) {
+        int index = chain.size();
+        string prevHash = chain.back().hash;
+
+        Block newBlock(index, transaction, prevHash);
+        chain.push_back(newBlock);
+    }
+
+    void displayChain() {
+        for (auto &block : chain) {
+            block.displayBlock();
+        }
+    }
+};
+
+int main() {
+    Blockchain blockchain;
+
+    int n;
+    cout << "Enter number of blocks to add (excluding Genesis block): ";
+    cin >> n;
+    cin.ignore();
+
+    for (int i = 1; i <= n; i++) {
+        string tx;
+        cout << "Enter transaction for Block " << i << ": ";
+        getline(cin, tx);
+        blockchain.addBlock(tx);
+    }
+    cout << "\n========== BLOCKCHAIN ==========\n";
+    blockchain.displayChain();
+
+    return 0;
+}
