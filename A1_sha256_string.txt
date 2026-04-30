@@ -1,5 +1,6 @@
 Ques1 Using SHA 256, obtain the message digest of string “Blockchain Developer”.
 OUTPUT: nano sha256_digest.cpp , g++ sha256_digest.cpp -lssl -lcrypto -o sha256_hash , ./sha256_hash
+
 Code: 
 #include <iostream>
 #include <iomanip>
