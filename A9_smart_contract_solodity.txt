@@ -1,5 +1,6 @@
 Ques9: Implement a smart contract using solidity programming language
 
+
 Code: 
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
